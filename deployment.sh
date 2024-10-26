@@ -25,7 +25,7 @@ chown -R $service_user:$service_group $service_log_path
 
 # 배포할 jar 다운로드
 echo "Download s3 to service path"
-aws s3 cp s3://tmc-sample-deployment/$s3_jar_path $service_jar
+aws s3 cp s3://tmc-sample-deployment/$service_name/$s3_jar_path $service_jar
 
 # systemd 파일 생성
 echo "Create $service_name.service for systemd"
