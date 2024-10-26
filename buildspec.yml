@@ -29,7 +29,9 @@ phases:
       - export SUBNETS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" "Name=tag:Name,Values=private*" --query "Subnets[*].SubnetId" --output text | tr '\t' ',' | sed 's/,$//')
             # 버전 정보 설정
       - echo "Determining current ASG version..."
-      - export VERSION=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names $(aws autoscaling describe-auto-scaling-groups --query "AutoScalingGroups[?AutoScalingGroupName.starts_with(@, '$SERVICE_NAME')].AutoScalingGroupName" --output text) --query "AutoScalingGroups[*].AutoScalingGroupName" --output text | awk -F'-' '{print $NF}' | sort -n | tail -n 1)
+      - |
+        QUERY="AutoScalingGroups[?AutoScalingGroupName.starts_with(@, '${SERVICE_NAME}')].AutoScalingGroupName"
+        export VERSION=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names $(aws autoscaling describe-auto-scaling-groups --query $QUERY --output text) --query "AutoScalingGroups[*].AutoScalingGroupName" --output text | awk -F'-' '{print $NF}' | sort -n | tail -n 1)
       - |
         if [ -z "$VERSION" ]; then 
           export VERSION=0000;
@@ -46,8 +48,8 @@ phases:
       - echo "Creating User Data script..."
       - cp deployment.sh /tmp/userdata.sh
       - |
-        sed -i "s/DEPLOY_SERVICE_NAME/$SERVICE_NAME/g" /tmp/userdata.sh
-        sed -i "s/JAR_PATH/$S3_JAR_PATH/g" /tmp/userdata.sh
+        sed -i "s|DEPLOY_SERVICE_NAME|$SERVICE_NAME/g" /tmp/userdata.sh
+        sed -i "s|JAR_PATH|$S3_JAR_PATH/g" /tmp/userdata.sh
   post_build:
     commands:
       # 현재 활성화된 ASG 확인 및 변수 설정
