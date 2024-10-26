@@ -1,6 +1,6 @@
 #!/bin/bash
 #변수 설정
-service_name=SERVICE_NAME
+service_name=DEPLOY_SERVICE_NAME
 service_user=$service_name
 service_group=$service_name
 service_path=/opt/$service_name

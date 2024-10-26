@@ -6,7 +6,7 @@ env:
     SECURITY_GROUP_NAME: ""
     VPC_NAME: ""
     TARGET_GROUP_NAME: ""
-    JAR_PATH: ""
+    S3_JAR_PATH: ""
     INSTANCE_TYPE: t3.medium
     PROFILE_NAME: demoapp-profile
   parameter-store:
@@ -46,8 +46,8 @@ phases:
       - echo "Creating User Data script..."
       - cp deployment.sh /tmp/userdata.sh
       - |
-        sed -i "s/SERVICE_NAME/$SERVICE_NAME/g" /tmp/userdata.sh
-        sed -i "s/JAR_PATH/$JAR_PATH/g" /tmp/userdata.sh
+        sed -i "s/DEPLOY_SERVICE_NAME/$SERVICE_NAME/g" /tmp/userdata.sh
+        sed -i "s/JAR_PATH/$S3_JAR_PATH/g" /tmp/userdata.sh
   post_build:
     commands:
       # 현재 활성화된 ASG 확인 및 변수 설정
