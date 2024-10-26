@@ -30,13 +30,12 @@ phases:
             # 버전 정보 설정
       - echo "Determining current ASG version..."
       - |
-        export highest_version=$(aws autoscaling describe-auto-scaling-groups \
-          --query "AutoScalingGroups[?starts_with(AutoScalingGroupName, \`$SERVICE_NAME\`)].AutoScalingGroupName" \
-          --output text | \
-          grep "^${SERVICE_NAME}-" | \
-          sed -E "s/^${SERVICE_NAME}-0*//" | \
-          sort -nr | \
-          head -n 1)
+        highest_version=$(aws autoscaling describe-auto-scaling-groups \
+            --query "AutoScalingGroups[?starts_with(AutoScalingGroupName, \`$SERVICE_NAME\`)].AutoScalingGroupName" \
+            --output json | \
+            jq -r ".[] | select(startswith(\"${SERVICE_NAME}-\")) | sub(\"^${SERVICE_NAME}-0*\"; \"\")" | \
+            sort -nr | \
+            head -n 1)
         export VERSION=$(printf "%04d" $highest_version)
       - |
         if [ -z "$VERSION" ]; then 
